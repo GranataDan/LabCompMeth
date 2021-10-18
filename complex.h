@@ -21,7 +21,7 @@ class Complex{
   void setphase();
 
 
-  void print() 
+  void print();
   //Attributes or Data Members
  private:
   double real_;
