@@ -13,8 +13,8 @@ class Complex{
   double r();
   double phi();
   //setters
-  void setim();
-  void setre();
+  void setim(double im);
+  void setre(double re);
   void setmag();
   void setr();
   void setphi();
