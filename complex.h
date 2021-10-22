@@ -12,6 +12,10 @@ class Complex{
   double phase();
   double r();
   double phi();
+  Complex operator+(const Complex& rhs)const;
+  Complex operator-(const Complex& rhs)const;
+  Complex operator*(Complex& rhs);
+  Complex operator/(Complex& rhs);
   //setters
   void setim(double im);
   void setre(double re);
@@ -19,8 +23,6 @@ class Complex{
   void setr();
   void setphi();
   void setphase();
-
-
   void print();
   //Attributes or Data Members
  private:
