@@ -3,6 +3,7 @@
 #include "TRandom3.h"
 using namespace std;
 int main(){
+  TRandom gen(0);
   int i;
   double M_B= 5279;
   double M_pi=140;
@@ -14,10 +15,22 @@ int main(){
   double p_xstar=0.;
   double p_ystar=0.;
   double p_zstar=0.;
-  
+  double phi_star=0.;
+  double theta_star=0.;
+  TRandom a;
   for (i=0; i<10000;i++){
-    Trandom.sphere(&p_xstar,&p_ystar,&p_zstar, pstar);
-    cout<<p_xstar<endl<<p_ystar<<endl<<p_zstar<<endl;
+    gen.Sphere(p_xstar,p_ystar,p_zstar, pstar);
+    if(p_xstar != 0){
+    phi_star = atan(p_ystar/p_xstar);
+    } else if(p_xstar == 0 && p_ystar < 0){
+      phi_star = -M_PI/2.;
+    } else if(p_xstar == 0 && p_ystar > 0){
+      phi_star = M_PI/2.;
+    }
+
+    theta_star = acos(p_zstar/pstar);
+
+    cout<<"nel CM i valori angolari sono:"<<endl<<"phi = "<<phi_star<<endl<<"theta = "<<theta_star<<endl<<endl;
 }
   return 0;
 }
