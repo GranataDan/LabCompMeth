@@ -1,6 +1,12 @@
 #include <iostream>
 #include <cmath>
 #include "TRandom3.h"
+#include "TLorentzVector.h"
+#include "TMath.h"
+#include "TH1F.h"
+#include "TCanvas.h"
+#include "TFile.h"
+
 using namespace std;
 int main(){
   TRandom gen(0);
@@ -9,7 +15,7 @@ int main(){
   double M_pi=140;
   double M_K=500;
   double p=300;
-  double pstar= sqrt((M_B*M_B*M_B*M_B + M_pi*M_pi*M_pi*M_pi + M_K*M_K*M_K*M_K - 2*M_B*M_B* M_pi*M_pi - 2*M_B*M_B*M_K*M_K - 2*M_pi*M_pi*M_K*M_K)/(2*M_B));
+  double pstar= (sqrt(M_B*M_B*M_B*M_B + M_pi*M_pi*M_pi*M_pi + M_K*M_K*M_K*M_K - 2*M_B*M_B* M_pi*M_pi - 2*M_B*M_B*M_K*M_K - 2*M_pi*M_pi*M_K*M_K))/(2*M_B);
   cout<<"la massa="<<M_B <<endl<< M_pi<<endl << M_K<<endl;
   cout<<"I momenti sono "<< p<<endl<< pstar<<endl;
   double p_xstar=0.;
@@ -17,7 +23,28 @@ int main(){
   double p_zstar=0.;
   double phi_star=0.;
   double theta_star=0.;
-  TRandom a;
+  double massinv = 0.;
+  //TLorentzVector Quadriv_pi, Quadriv_K;
+
+  TString rootfname("./output.root");
+  TFile rfile(rootfname, "RECREATE");
+  if( !rfile.IsOpen() ){
+    cout<<"problemaaaaaaaaaa"<<endl;
+    exit(-1);
+  }
+
+  cout<<"storing output in root file "<<rootfname<<endl;
+
+  double x1 = 5250, x2 = 5350;
+  double resol = 1;
+  int nbins = 100;
+  double xlo = x1*(1-5*resol);
+  double xhi = x2*(1+5*resol);
+  double binwidth = (xhi - xlo)/nbins;
+  TH1F hx1("hx1", "distribuzione massa invariante", nbins, xlo, xhi);
+
+
+
   for (i=0; i<10000;i++){
     gen.Sphere(p_xstar,p_ystar,p_zstar, pstar);
     if(p_xstar != 0){
@@ -31,6 +58,34 @@ int main(){
     theta_star = acos(p_zstar/pstar);
 
     cout<<"nel CM i valori angolari sono:"<<endl<<"phi = "<<phi_star<<endl<<"theta = "<<theta_star<<endl<<endl;
+
+    TLorentzVector Quadriv_pi(p_xstar, p_ystar, p_zstar, sqrt(M_pi*M_pi + pstar*pstar));
+    TLorentzVector Quadriv_K(-1.*p_xstar, -1.*p_ystar, -1.*p_zstar, sqrt(M_K*M_K + pstar*pstar));
+    Quadriv_pi.Boost(p/M_B, 0, 0);
+    Quadriv_K.Boost(p/M_B, 0, 0);
+
+    cout<<"I valori del quadrivettore di pi sono: "<<endl<<"px = "<<Quadriv_pi.X()<<endl<<"py = "<<Quadriv_pi.Y()<<endl<<"pz = "<<Quadriv_pi.Z()<<endl<<"E = "<<Quadriv_pi.T()<<endl<<endl;
+
+    cout<<"I valori del quadrivettore di K sono: "<<endl<<"px = "<<Quadriv_K.X()<<endl<<"py = "<<Quadriv_K.Y()<<endl<<"pz = "<<Quadriv_K.Z()<<endl<<"E = "<<Quadriv_K.T()<<endl<<endl;
+
+    massinv = sqrt(pow(Quadriv_pi.T()+Quadriv_K.T(),2) - pow(Quadriv_pi.X()+Quadriv_K.X(),2));
+    cout<<"la massa invariante Ã¨: "<<massinv<<endl;
+
+    hx1.Fill(massinv);
+
 }
+
+  TCanvas canv("canv", "canvas for plotting", 1280, 1024);
+
+  hx1.GetXaxis()->SetTitle("massa invariante (MeV)");
+  hx1.Draw();
+
+  canv.SaveAs("./x.pdf");
+  canv.SaveAs("./x.jpg");
+
+  hx1.Write();
+
+  rfile.Close();
+
   return 0;
 }
