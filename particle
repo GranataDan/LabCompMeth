@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <cmath>
 #include "TRandom3.h"
@@ -24,6 +25,9 @@ int main(){
   double phi_star=0.;
   double theta_star=0.;
   double massinv = 0.;
+  double p_pi=0.;
+  double p_K=0.;
+  
   //TLorentzVector Quadriv_pi, Quadriv_K;
 
   TString rootfname("./output.root");
@@ -35,13 +39,19 @@ int main(){
 
   cout<<"storing output in root file "<<rootfname<<endl;
 
-  double x1 = 5250, x2 = 5350;
-  double resol = 1;
-  int nbins = 100;
+  double x1 = 2200, x2 = 2800;
+  double resol = 0.03;
+  int nbins = 10000;
   double xlo = x1*(1-5*resol);
   double xhi = x2*(1+5*resol);
+  double a1= 1000;
+  double a2= 4000;
+  double alo=a1*(1-5*0.001);
+  double ai=a2*(1-5*0.001);
   double binwidth = (xhi - xlo)/nbins;
-  TH1F hx1("hx1", "distribuzione massa invariante", nbins, xlo, xhi);
+  TH1F hx1("hx1", "p pi", nbins, xlo, xhi);
+  TH1F hx2("hx2", "p K", 1000, alo, ai);
+  
 
 
 
@@ -57,34 +67,44 @@ int main(){
 
     theta_star = acos(p_zstar/pstar);
 
-    cout<<"nel CM i valori angolari sono:"<<endl<<"phi = "<<phi_star<<endl<<"theta = "<<theta_star<<endl<<endl;
+    // cout<<"nel CM i valori angolari sono:"<<endl<<"phi = "<<phi_star<<endl<<"theta = "<<theta_star<<endl<<endl;
 
-    TLorentzVector Quadriv_pi(p_xstar, p_ystar, p_zstar, sqrt(M_pi*M_pi + pstar*pstar));
-    TLorentzVector Quadriv_K(-1.*p_xstar, -1.*p_ystar, -1.*p_zstar, sqrt(M_K*M_K + pstar*pstar));
+    TLorentzVector Quadriv_pi(-p_xstar, -p_ystar, -p_zstar, sqrt(M_pi*M_pi + pstar*pstar));
+    TLorentzVector Quadriv_K(+1.*p_xstar, +1.*p_ystar, +1.*p_zstar, sqrt(M_K*M_K + pstar*pstar));
     Quadriv_pi.Boost(p/M_B, 0, 0);
     Quadriv_K.Boost(p/M_B, 0, 0);
+    TVector3 momentum_pi(Quadriv_pi.X(), Quadriv_pi.Y(), Quadriv_pi.Z());
+    TVector3 momentum_K(Quadriv_K.X(), Quadriv_K.Y(), Quadriv_K.Z());
+    momentum_pi.Angle(momentum_K);
+    p_pi=sqrt(Quadriv_pi.X()*Quadriv_pi.X()+Quadriv_pi.Y()*Quadriv_pi.Y()+Quadriv_pi.Z()*Quadriv_pi.Z());
+    p_K=sqrt(Quadriv_K.X()*Quadriv_K.X()+Quadriv_K.Y()*Quadriv_K.Y()+Quadriv_K.Z()*Quadriv_K.Z());
+    
+    cout<</*"L'angolo è"<<momentum_pi.Angle(momentum_K)<<endl<<*/"p pi = "<<p_pi<<endl<<"p K = "<<p_K<<endl/*<<"pz = "<<Quadriv_pi.Z()<<endl<<"E = "<<Quadriv_pi.T()<<endl<<endl*/;
 
-    cout<<"I valori del quadrivettore di pi sono: "<<endl<<"px = "<<Quadriv_pi.X()<<endl<<"py = "<<Quadriv_pi.Y()<<endl<<"pz = "<<Quadriv_pi.Z()<<endl<<"E = "<<Quadriv_pi.T()<<endl<<endl;
-
-    cout<<"I valori del quadrivettore di K sono: "<<endl<<"px = "<<Quadriv_K.X()<<endl<<"py = "<<Quadriv_K.Y()<<endl<<"pz = "<<Quadriv_K.Z()<<endl<<"E = "<<Quadriv_K.T()<<endl<<endl;
+																				      //cout<<"I valori del quadrivettore di K sono: "<<endl<<"px = "<<Quadriv_K.X()<<endl<<"py = "<<Quadriv_K.Y()<<endl<<"pz = "<<Quadriv_K.Z()<<endl<<"E = "<<Quadriv_K.T()<<endl<<endl;
 
     massinv = sqrt(pow(Quadriv_pi.T()+Quadriv_K.T(),2) - pow(Quadriv_pi.X()+Quadriv_K.X(),2));
-    cout<<"la massa invariante Ã¨: "<<massinv<<endl;
+												       //cout<<"la massa invariante Ã¨: "<<massinv<<endl;
 
-    hx1.Fill(massinv);
+    hx1.Fill(p_pi);
+					       hx2.Fill(p_K);					       
 
 }
 
   TCanvas canv("canv", "canvas for plotting", 1280, 1024);
 
-  hx1.GetXaxis()->SetTitle("massa invariante (MeV)");
-  hx1.Draw();
-
-  canv.SaveAs("./x.pdf");
-  canv.SaveAs("./x.jpg");
+  hx1.GetXaxis()->SetTitle("p pi(MeV)");
+ 
+  hx2.GetXaxis()->SetTitle("p_K (MeV)");
+  hx2.Draw();
+  canv.SaveAs("./pi_pi.pdf");
+  canv.SaveAs("./pi_pi.jpg");
+   hx1.Draw();
+  canv.SaveAs("./pi_K.pdf");
+  canv.SaveAs("./pi_K.jpg");
 
   hx1.Write();
-
+  hx2.Write();
   rfile.Close();
 
   return 0;
