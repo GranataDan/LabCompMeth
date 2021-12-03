@@ -1,0 +1,99 @@
+#librerie
+
+from pylab import *
+from scipy.optimize import leastsq, curve_fit
+from scipy.stats import *
+from IPython.display import Image
+import matplotlib.pyplot as plt
+%matplotlib inline
+import matplotlib.pyplot as plt
+import numpy as np
+import math
+from pylab import *
+from scipy import stats
+from pylab import *
+from io import StringIO
+%matplotlib inline
+import random
+
+
+#ESERCIZIO 1
+
+N = 50
+x = -1
+y = -1
+i = 0
+j = 0
+a = 0
+dx = 2/N
+
+while i <= N +1:              #iterazione y
+    x = -1
+    j = 0
+    while j <= N:          #iterazione x
+        x = -1 + j*dx
+        if x*x + y*y <= 1:
+            a += 1
+            plt.plot(x, y, color = 'red', marker = '.')
+        j += 1
+        if x*x + y*y > 1:
+            plt.plot(x, y, color = 'blue', marker='.')
+    y = -1 + i*dx   
+    i += 1
+    
+   
+
+print(a/N**2*4)
+plt.show()
+
+
+#ESERCIZIO 2
+
+N = 1000
+a = b = c = 0
+n = 0
+while n < N:
+    d1 = randint(1,7)
+    d2 = randint(1,7)
+    d3 = randint(1,7)
+    d4 = randint(1,7)
+    d5 = randint(1,7)
+    print(d1, d2, d3, d4, d5)
+    n += 1
+    if d1!=d2:
+        if d1!=d3:
+            if d1!=d4:
+                if d1!=d5:
+                    if d2!=d3:
+                        if d2!=d4:
+                            if d2!=d5:
+                                if d3!=d4:
+                                    if d3!=d5:
+                                        if d4!=d5:
+                                            if d1!=6 and d2!=6 and d3!=6 and d4!=6 and d5!=6:
+                                                print('Combinazione 1,2,3,4,5')
+                                                a += 1
+    if d1!=d2:
+        if d1!=d3:
+            if d1!=d4:
+                if d1!=d5:
+                    if d2!=d3:
+                        if d2!=d4:
+                            if d2!=d5:
+                                if d3!=d4:
+                                    if d3!=d5:
+                                        if d4!=d5:
+                                            if d1!=1 and d2!=1 and d3!=1 and d4!=1 and d5!=1:
+                                                print('Combinazione 2,3,4,5,6')
+                                                b += 1
+    if d1==d2 and d2==d3 and d3==d4 and d4==d5:
+        print('Tutti numeri ugualiiiiii')
+        c += 1
+        
+  
+print('numero rolls = ', n) 
+print(a, b, c)
+
+x = np.arange(3)
+plt.bar(x, height = [a, b, c])
+plt.xticks(x, ['comb 1', 'comb 2', 'comb 3'])
